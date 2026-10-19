@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الأباجورة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#060608;--amber:#f2b45a;--amber2:#d98a2b;--cream:#f6e7cc;--muted:#a8967a;
+color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--cream);font-family:Cairo,system-ui,"Segoe UI",Tahoma,sans-serif;overflow:hidden}
+.wall{position:fixed;inset:0;opacity:0;transition:opacity 1s ease;pointer-events:none;
+background:radial-gradient(ellipse 55% 65% at var(--wx) var(--wy),rgba(224,150,64,.42),transparent 70%),
+repeating-linear-gradient(90deg,rgba(0,0,0,.2) 0 2px,transparent 2px 48px),linear-gradient(#2b1a0d,#110905)}
+body.on .wall{opacity:1}
+@property --wx{syntax:'<percentage>';inherits:false;initial-value:24%}
+@property --wy{syntax:'<percentage>';inherits:false;initial-value:30%}
+.wall{transition:opacity 1s ease,--wx 1.6s ease,--wy 1.6s ease}
+body.in .wall{--wx:50%;--wy:44%}
+.stage{position:relative;height:100%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr);direction:ltr;overflow:hidden;transition:opacity .8s,visibility .8s}
+body.in .stage{opacity:0;visibility:hidden}
+.lampbox{min-height:0;min-width:0;padding:3vh 2vw 2vh}
+#lamp{display:block;width:100%;height:100%;overflow:visible;touch-action:none;user-select:none}
+.formbox{display:flex;min-height:0;min-width:0;overflow-y:auto;padding:16px}
+.card{direction:rtl;margin:auto;width:min(390px,100%);padding:28px 26px;border-radius:20px;background:rgba(18,13,9,.72);
+border:1px solid rgba(242,180,90,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+box-shadow:0 30px 80px rgba(0,0,0,.55);opacity:0;visibility:hidden;transform:translateY(10px);
+transition:opacity .7s ease,transform .7s ease,visibility 0s .7s}
+body.on .card{opacity:1;visibility:visible;transform:none;transition:opacity .8s ease .45s,transform .8s ease .45s,visibility 0s}
+.card small{color:var(--amber);font-size:13px;font-weight:600}
+.card h1{margin:6px 0 22px;font-size:clamp(26px,4vw,34px);line-height:1.35;font-weight:800}
+.card h1 span{display:block;color:var(--muted);font-weight:400}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+.field{display:flex;align-items:center;gap:8px;padding:0 14px;height:52px;border-radius:12px;background:rgba(255,255,255,.04);
+border:1px solid rgba(255,255,255,.1);transition:border-color .2s,box-shadow .2s}
+.field:focus-within{border-color:var(--amber);box-shadow:0 0 0 3px rgba(242,180,90,.18)}
+.field input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--cream);font:inherit;font-size:17px;letter-spacing:.08em}
+.field button{background:none;border:0;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;padding:6px}
+.field button:hover{color:var(--amber)}
+.err{min-height:22px;margin:8px 2px 4px;color:#ff9d7a;font-size:13px}
+.go{width:100%;height:52px;border:0;border-radius:12px;font:inherit;font-size:17px;font-weight:800;color:#2a1704;cursor:pointer;
+background:linear-gradient(90deg,#f6c477,#d98a2b);box-shadow:0 10px 30px rgba(217,138,43,.3);transition:transform .15s,filter .2s}
+.go:hover{filter:brightness(1.08)}.go:active{transform:scale(.98)}
+.go:focus-visible,.field button:focus-visible,.out:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+.shake{animation:shake .4s}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+/* lamp parts */
+.shadeOn,.cone,.glow,.rimOn,.bulbOn{opacity:0;transition:opacity .6s ease}
+body.on .shadeOn,body.on .cone,body.on .glow,body.on .rimOn,body.on .bulbOn{opacity:1}
+body.on .cone{transition-delay:.1s}
+#hint{fill:#6f6350;font-size:14px;transition:fill .6s}
+body.on #hint{fill:#a8967a}
+.hit:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+/* home */
+#home{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;
+opacity:0;visibility:hidden;transition:opacity .9s ease .3s,visibility 0s .3s;padding:24px}
+body.in #home{opacity:1;visibility:visible}
+#home h1{margin:0;font-size:clamp(30px,6vw,52px);font-weight:800;text-shadow:0 0 26px rgba(255,170,70,.6)}
+.heart{position:relative;width:min(84vw,50vh);aspect-ratio:1/1}
+.heart canvas{position:absolute;inset:0;width:100%;height:100%}
+.disc{position:absolute;left:50%;bottom:4%;width:44%;height:7%;transform:translateX(-50%);border-radius:50%;
+background:radial-gradient(ellipse at center,#fff4d6 0,#ffc56b 38%,rgba(217,138,43,.75) 62%,transparent 74%);
+box-shadow:0 0 40px 12px rgba(242,180,90,.5),0 0 110px 36px rgba(217,138,43,.28);animation:disc 3s ease-in-out infinite;transition:width .6s,height .6s,filter .6s}
+.disc::after{content:"";position:absolute;inset:-30% -12%;border-radius:50%;border:1px solid rgba(255,214,140,.5);animation:ring 3s ease-out infinite}
+.heart[data-m=burst] .disc{width:52%;height:10%;filter:brightness(1.25)}
+@keyframes disc{50%{opacity:.82}}
+@keyframes ring{0%{transform:scale(.7);opacity:.8}100%{transform:scale(1.25);opacity:0}}
+@media (max-height:480px){#home p{display:none}.heart{width:min(60vw,52vh)}}
+#home p{margin:0;color:var(--muted);font-size:18px}
+.out{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);inset-inline-end:14px;width:36px;height:36px;border-radius:50%;background:none;border:1px solid rgba(242,180,90,.25);color:rgba(242,180,90,.55);font:inherit;font-size:14px;cursor:pointer}
+.out:hover{background:rgba(242,180,90,.1)}
+@media (max-width:760px){
+.stage{grid-template-columns:1fr;grid-template-rows:46% 54%}
+.lampbox{padding:2vh 0 0}.formbox{align-items:flex-start;padding-top:8px}
+.card{padding:22px 20px}.card h1{margin-bottom:14px}
+}
+@media (max-height:540px) and (min-width:761px){.card{padding:18px 20px}.card h1{margin:4px 0 12px;font-size:24px}.field,.go{height:44px}.err{min-height:18px;margin:4px 0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01s!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wall"></div>
+
+<div class="stage">
+  <div class="lampbox">
+    <svg id="lamp" viewBox="0 0 420 720" preserveAspectRatio="xMidYMax meet" role="group" aria-label="أباجورة بحبل">
+      <defs>
+        <linearGradient id="gOff" x1="0" x2="1"><stop offset="0" stop-color="#15151a"/><stop offset=".5" stop-color="#2b2b33"/><stop offset="1" stop-color="#0d0d11"/></linearGradient>
+        <linearGradient id="gOn" x1="0" x2="1"><stop offset="0" stop-color="#d79a4e"/><stop offset=".5" stop-color="#f9cf94"/><stop offset="1" stop-color="#c98a40"/></linearGradient>
+        <linearGradient id="gCone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb347" stop-opacity=".5"/><stop offset="1" stop-color="#ffb347" stop-opacity=".05"/></linearGradient>
+        <radialGradient id="gGlow"><stop offset="0" stop-color="#ffc56b" stop-opacity=".55"/><stop offset="1" stop-color="#ffc56b" stop-opacity="0"/></radialGradient>
+        <linearGradient id="gPole" x1="0" x2="1"><stop offset="0" stop-color="#17171b"/><stop offset=".5" stop-color="#43434c"/><stop offset="1" stop-color="#101014"/></linearGradient>
+      </defs>
+      <polygon class="cone" points="116,150 284,150 620,652 -200,652" fill="url(#gCone)"/>
+      <circle class="glow" cx="200" cy="150" r="200" fill="url(#gGlow)"/>
+      <ellipse cx="200" cy="654" rx="64" ry="14" fill="#000" opacity=".55"/>
+      <ellipse cx="200" cy="648" rx="52" ry="12" fill="#17171b" stroke="#3a3a42"/>
+      <rect x="196" y="176" width="8" height="470" fill="url(#gPole)"/>
+      <rect x="192" y="466" width="16" height="9" rx="2" fill="#b8903f"/>
+      <rect x="192" y="632" width="16" height="7" rx="2" fill="#b8903f"/>
+      <circle cx="200" cy="170" r="13" fill="#34343b"/>
+      <circle class="bulbOn" cx="200" cy="170" r="13" fill="#fff0cf" style="filter:drop-shadow(0 0 10px #ffc56b)"/>
+      <path d="M152 62H248Q252 62 255 68L286 150H114L145 68Q148 62 152 62Z" fill="url(#gOff)"/>
+      <path class="shadeOn" d="M152 62H248Q252 62 255 68L286 150H114L145 68Q148 62 152 62Z" fill="url(#gOn)"/>
+      <ellipse cx="200" cy="150" rx="86" ry="10" fill="#0b0b0e" stroke="#7a6130" stroke-width="1.2"/>
+      <ellipse class="rimOn" cx="200" cy="150" rx="86" ry="10" fill="#ffe6bb"/>
+      <path id="ropeBase" fill="none" stroke="#cdb68e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path id="ropeDash" fill="none" stroke="#6e5a3a" stroke-width="2.4" stroke-dasharray="1.5 3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <g id="bead"><circle r="6" fill="#d8b25a" stroke="#7a5d1e"/><circle r="2.2" cy="-1" fill="#fff3c9" opacity=".7"/></g>
+      <rect class="hit" x="216" y="148" width="40" height="230" fill="transparent" pointer-events="none" tabindex="0" role="button" aria-label="اشدّ حبل الأباجورة"/>
+      <text id="hint" x="330" y="330" text-anchor="middle"></text>
+    </svg>
+  </div>
+
+  <div class="formbox">
+    <form class="card" id="f" autocomplete="off">
+      <small>دخول خاص</small>
+      <h1>أهلاً بيك.<span>اكتب الباسوورد وادخل.</span></h1>
+      <label for="pw">الباسوورد</label>
+      <div class="field">
+        <input id="pw" type="password" autocomplete="current-password" placeholder="••••••••" required>
+        <button type="button" id="eye">إظهار</button>
+      </div>
+      <div class="err" id="err" role="alert"></div>
+      <button class="go" type="submit">دخول</button>
+    </form>
+  </div>
+</div>
+
+<main id="home">
+  <div class="heart" id="heart" aria-hidden="true"><canvas id="hc"></canvas><div class="disc"></div></div>
+  <h1>خد قلبي 💝</h1>
+
+  <button class="out" id="out" type="button" aria-label="خروج">✕</button>
+  <audio id="song" preload="auto"><source src="100.mp3"><source src="100.m4a"><source src="100.wav"><source src="100.ogg"><source src="100.mpeg" type="audio/mpeg"><source src="100.mpg" type="audio/mpeg"></audio>
+</main>
+
+<script>
+const PASSWORD = "1234"; // غيّر الباسوورد من هنا
+
+const $ = s => document.querySelector(s);
+const svg = $('#lamp'), hint = $('#hint'), pw = $('#pw'), err = $('#err'), card = $('#f');
+const N = 14, L = 12, AX = 232, AY = 148, REST = L * (N - 1);
+const P = Array.from({length: N}, (_, i) => ({x: AX + i * .2, y: AY + i * L, px: AX + i * .2, py: AY + i * L}));
+let drag = false, fired = false, moved = 0, sx = 0, sy = 0, tx = 0, ty = 0, on = false;
+
+function setLight(v){
+  on = v;
+  document.body.classList.toggle('on', v);
+  hint.textContent = v ? 'اشدّه تاني عشان تطفّي' : 'اشدّ الحبل عشان النور ينوّر';
+  pw.value = ''; err.textContent = '';
+  if (v && matchMedia('(hover:hover)').matches) setTimeout(() => on && pw.focus(), 1000);
+  else pw.blur();
+}
+const toggle = () => setLight(!on);
+const tug = () => { const e = P[N - 1]; e.py = e.y - 14; };
+
+function pos(e){
+  const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+const near = q => { for (let i = N - 4; i < N; i++) if (Math.hypot(P[i].x - q.x, P[i].y - q.y) < 30) return true; return false; };
+
+svg.addEventListener('pointerdown', e => {
+  const q = pos(e); if (!near(q)) return;
+  drag = true; fired = false; moved = 0; sx = tx = q.x; sy = ty = q.y;
+  svg.setPointerCapture(e.pointerId); svg.style.cursor = 'grabbing';
+});
+svg.addEventListener('pointermove', e => {
+  const q = pos(e);
+  if (!drag){ svg.style.cursor = near(q) ? 'grab' : 'default'; return; }
+  tx = q.x; ty = q.y; moved = Math.max(moved, Math.hypot(q.x - sx, q.y - sy));
+});
+const up = () => {
+  if (!drag) return;
+  drag = false; svg.style.cursor = 'default';
+  if (moved < 6 && !fired){ tug(); toggle(); }
+};
+svg.addEventListener('pointerup', up);
+svg.addEventListener('pointercancel', up);
+$('.hit').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); tug(); toggle(); }
+});
+
+function step(){
+  for (let i = 1; i < N; i++){
+    const p = P[i], vx = (p.x - p.px) * .985, vy = (p.y - p.py) * .985;
+    p.px = p.x; p.py = p.y; p.x += vx; p.y += vy + .55;
+  }
+  const e = P[N - 1];
+  let gx = tx, gy = ty;
+  if (drag){
+    const dx = gx - AX, dy = gy - AY, d = Math.hypot(dx, dy), max = REST * 1.55;
+    if (d > max){ gx = AX + dx / d * max; gy = AY + dy / d * max; }
+  }
+  for (let k = 0; k < 10; k++){
+    P[0].x = AX; P[0].y = AY;
+    if (drag){ e.x = gx; e.y = gy; e.px = gx; e.py = gy; }
+    for (let i = 0; i < N - 1; i++){
+      const a = P[i], b = P[i + 1];
+      const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || .001;
+      const diff = (d - L) / d * .5;
+      if (i === 0){ b.x -= dx * diff * 2; b.y -= dy * diff * 2; }
+      else { a.x += dx * diff; a.y += dy * diff; b.x -= dx * diff; b.y -= dy * diff; }
+    }
+  }
+  if (drag && !fired && Math.hypot(e.x - AX, e.y - AY) - REST > 34){ fired = true; toggle(); }
+}
+
+function draw(){
+  let d = `M${P[0].x} ${P[0].y}`;
+  for (let i = 1; i < N - 1; i++){
+    const mx = (P[i].x + P[i + 1].x) / 2, my = (P[i].y + P[i + 1].y) / 2;
+    d += `Q${P[i].x.toFixed(1)} ${P[i].y.toFixed(1)} ${mx.toFixed(1)} ${my.toFixed(1)}`;
+  }
+  const e = P[N - 1];
+  d += `L${e.x.toFixed(1)} ${e.y.toFixed(1)}`;
+  $('#ropeBase').setAttribute('d', d); $('#ropeDash').setAttribute('d', d);
+  $('#bead').setAttribute('transform', `translate(${e.x.toFixed(1)} ${(e.y + 5).toFixed(1)})`);
+}
+(function loop(){ step(); draw(); requestAnimationFrame(loop); })();
+
+$('#eye').addEventListener('click', () => {
+  const show = pw.type === 'password';
+  pw.type = show ? 'text' : 'password';
+  $('#eye').textContent = show ? 'إخفاء' : 'إظهار';
+});
+
+card.addEventListener('submit', e => {
+  e.preventDefault();
+  if (pw.value === PASSWORD){ err.textContent = ''; document.body.classList.add('in'); startHeart(); playSong(); }
+  else {
+    err.textContent = 'الباسوورد غلط، جرّب تاني.';
+    card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+    pw.select();
+  }
+});
+$('#out').addEventListener('click', () => { document.body.classList.remove('in'); stopHeart(); song.pause(); setLight(true); });
+
+/* ===== particle heart ===== */
+const hc = $('#hc'), hx = hc.getContext('2d'), hbox = $('#heart');
+const COLS = ['#ffe066', '#ffb02e', '#ff7a1a', '#ff4f6d', '#ff7ab8', '#fff4cf'];
+const DUR = {form: 3.2, hold: 4.5, burst: 3.6, reform: 2.6}, NEXT = {form: 'hold', hold: 'burst', burst: 'reform', reform: 'hold'};
+const SPR = {form: 16, hold: 24, burst: .5, reform: 20}, DMP = {form: 5, hold: 6, burst: 1.1, reform: 5.5};
+const RM = matchMedia('(prefers-reduced-motion:reduce)').matches;
+let HP = [], hRun = false, hT0 = 0, hLast = 0, hMode = 'form', hModeT = 0, HW = 1, HH = 1, DPR = 1, hRO;
+
+function heartPt(){
+  const t = Math.random() * 6.2832;
+  let x = 16 * Math.pow(Math.sin(t), 3);
+  let y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+  const s = Math.random() < .35 ? .96 + Math.random() * .04 : Math.sqrt(Math.random());
+  x *= s; y = -2.5 + (y + 2.5) * s;
+  return [.5 + x * .027, .4 - (y + 2.5) * .0245];
+}
+function sizeHeart(){
+  const r = hbox.getBoundingClientRect();
+  DPR = Math.min(2, devicePixelRatio || 1); HW = r.width; HH = r.height;
+  hc.width = HW * DPR; hc.height = HH * DPR;
+}
+function startHeart(){
+  if (hRun) return;
+  sizeHeart();
+  const n = Math.max(1500, Math.min(3200, Math.round(HW * HH / 95)));
+  HP = Array.from({length: n}, () => {
+    const [tx, ty] = heartPt();
+    return {tx, ty, x: .5 + (Math.random() - .5) * .5, y: .86 + Math.random() * .04, vx: 0, vy: 0, a: 0,
+      d: Math.random() * 1.8, ph: Math.random() * 6.28, f: 1 + Math.random() * 3,
+      s: .8 + Math.pow(Math.random(), 2) * 2.2, c: COLS[Math.random() * COLS.length | 0], k: Math.random() < .12};
+  });
+  HP.sort((a, b) => a.c < b.c ? -1 : 1);
+  hMode = 'form'; hModeT = 0; hbox.dataset.m = 'form';
+  hT0 = hLast = performance.now(); hRun = true;
+  if (!hRO){ hRO = new ResizeObserver(sizeHeart); hRO.observe(hbox); }
+  requestAnimationFrame(hFrame);
+}
+const stopHeart = () => { hRun = false; };
+const song = $('#song');
+function playSong(){ try { song.currentTime = 0; const r = song.play(); if (r) r.catch(() => {}); } catch (e) {} }
+
+function hFrame(now){
+  if (!hRun) return;
+  requestAnimationFrame(hFrame);
+  const dt = Math.min(.033, (now - hLast) / 1000 || .016); hLast = now;
+  const T = (now - hT0) / 1000;
+  hModeT += dt;
+  if (hModeT > DUR[hMode]){
+    hMode = NEXT[hMode]; if (RM && hMode === 'burst') hMode = 'reform';
+    hModeT = 0; hbox.dataset.m = hMode;
+    if (hMode === 'burst') for (const p of HP){
+      const m = p.k ? 2.2 : 1;
+      p.vx += ((p.x - .5) * 3 + (Math.random() - .5) * 1.6) * m;
+      p.vy += ((p.y - .42) * 2.5 + (Math.random() - .35) * 1.2) * m;
+    }
+  }
+  const burst = hMode === 'burst', k = SPR[hMode], c = DMP[hMode], bob = Math.sin(T * 1.3) * .006;
+  const sc = Math.max(.7, Math.min(1.3, HW / 520)) * DPR, W = HW * DPR, H = HH * DPR;
+  hx.clearRect(0, 0, hc.width, hc.height);
+  hx.globalCompositeOperation = 'lighter';
+  let col = '';
+  for (const p of HP){
+    if (hMode === 'form' && hModeT < p.d) continue;
+    p.a = Math.min(1, p.a + dt * 1.1);
+    const tx = p.tx + Math.sin(T * p.f + p.ph) * .004, ty = p.ty + bob + Math.cos(T * p.f * .8 + p.ph) * .004;
+    p.vx += (tx - p.x) * k * dt; p.vy += (ty - p.y) * k * dt;
+    if (burst){
+      p.vx += (-(p.y - .5) * 3 + Math.sin(T * 2.7 + p.ph) * 2.2 + (.5 - p.x) * 1.2) * dt;
+      p.vy += (.9 + Math.cos(T * 2.1 + p.ph * 1.7) * 1.6 + (.62 - p.y) * .7) * dt;
+    }
+    p.vx -= p.vx * c * dt; p.vy -= p.vy * c * dt;
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    if (p.y > .93){ p.y = .93; p.vy *= -.4; }
+    if (p.x < .02 || p.x > .98){ p.x = Math.max(.02, Math.min(.98, p.x)); p.vx *= -.5; }
+    const a = p.a * (.5 + .5 * Math.sin(T * p.f * 1.7 + p.ph)) * (burst ? 1.15 : 1);
+    if (col !== p.c){ col = p.c; hx.fillStyle = col; hx.strokeStyle = col; }
+    const px = p.x * W, py = p.y * H, sp = Math.hypot(p.vx, p.vy);
+    if (p.k && sp > .3 && hMode !== 'hold' && hMode !== 'form'){
+      hx.globalAlpha = Math.min(1, sp * .7) * p.a; hx.lineWidth = 1.2 * sc;
+      hx.beginPath(); hx.moveTo(px, py); hx.lineTo(px - p.vx * .06 * W, py - p.vy * .06 * H); hx.stroke();
+    } else {
+      const s = p.s * sc;
+      if (p.s > 1.6){ hx.globalAlpha = a * .1; hx.fillRect(px - s * 1.6, py - s * 1.6, s * 3.2, s * 3.2); }
+      hx.globalAlpha = a; hx.fillRect(px - s / 2, py - s / 2, s, s);
+    }
+  }
+  hx.globalAlpha = 1;
+}
+
+setLight(false);
+setTimeout(() => { P[N - 1].px -= 3; }, 600); // a small nudge so the cord sways at load
+</script>
+</body>
+</html>
